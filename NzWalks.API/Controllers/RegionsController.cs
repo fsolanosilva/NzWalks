@@ -2,6 +2,7 @@
 using NzWalks.API.Data;
 using NzWalks.API.Models.Domain;
 using NzWalks.API.Models.DTO;
+using System.Runtime.InteropServices;
 
 namespace NzWalks.API.Controllers
 {
@@ -97,6 +98,69 @@ namespace NzWalks.API.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = regionDomainModel.Id }, regionDto);
         }
+
+        // UPDATE REGION
+        // PUT:  https://localhost:portnumber/api/regions/{ID}
+        [HttpPut]
+        [Route("{id:Guid}")]
+        public IActionResult Update([FromRoute] Guid id, [FromBody] UpdateRegionRequestDto updateRegionRequestDto)
+        {
+            // Check if region exist
+            var regionDomainModel = dbContext.Regions.FirstOrDefault(x => x.Id == id);
+
+            if (regionDomainModel == null)
+            {
+                return NotFound();
+            }
+
+            // Map DTO to Domain Model
+            regionDomainModel.Code = updateRegionRequestDto.Code;
+            regionDomainModel.Name = updateRegionRequestDto.Name;
+            regionDomainModel.RegionImageUrl = updateRegionRequestDto.RegionImageUrl;
+
+            dbContext.SaveChanges();
+
+            // Convert Domain Model do DTO
+            var regionDto = new RegionDto
+            {
+                Id = regionDomainModel.Id,
+                RegionImageUrl = regionDomainModel.RegionImageUrl,
+                Code = regionDomainModel.Code,
+                Name = regionDomainModel.Name,
+            };
+
+            return Ok(regionDto);
+
+        }
+
+        // DELETE REGION
+        // DELETE: https://localhost:portnumber/api/regions/{id}
+        [HttpDelete]
+        [Route("{id:guid}")]
+        public IActionResult Delete([FromRoute] Guid id)
+        {
+            var regionDomainModel = dbContext.Regions.FirstOrDefault(x => x.Id == id);
+
+            if (regionDomainModel == null)
+                return NotFound();
+
+            dbContext.Regions.Remove(regionDomainModel);
+            dbContext.SaveChanges();
+
+            // return deleted region back
+            // map Domain Model to Dto
+            var regionDto = new RegionDto
+            {
+                Id = regionDomainModel.Id,
+                RegionImageUrl = regionDomainModel.RegionImageUrl,
+                Code = regionDomainModel.Code,
+                Name = regionDomainModel.Name,
+            };
+
+            return Ok(regionDto);
+        }
+
+
 
 
         #region old

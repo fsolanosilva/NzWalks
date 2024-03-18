@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using NzWalks.API.CustomActionFilters;
 using NzWalks.API.Data;
 using NzWalks.API.Models.Domain;
@@ -12,6 +12,7 @@ namespace NzWalks.API.Controllers
     // https://localhost:1234/api/regions
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class RegionsController : ControllerBase
     {
         private readonly NzWalksDbContext dbContext;

@@ -67,11 +67,14 @@ namespace NzWalks.API.Controllers
                     if (roles != null)
                     {
                         var jwtToken = tokenRepository.CreateJwtToken(user, roles.ToList());
-                        return Ok(jwtToken);
-                    }
 
-                    // create Token
-                    return Ok();
+                        var response = new LoginResponseDto
+                        {
+                            JwtToken = jwtToken
+                        };
+
+                        return Ok(response);
+                    }
                 }
             }
 

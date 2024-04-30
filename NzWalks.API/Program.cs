@@ -1,18 +1,31 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using NzWalks.API.Data;
 using NzWalks.API.Mappings;
+using NzWalks.API.Middlewares;
 using NzWalks.API.Repositories;
+using Serilog;
 using System.Text;
-using Microsoft.OpenApi.Models;
-using Microsoft.Extensions.FileProviders.Physical;
-using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+var logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/NzWalks_log.txt", rollingInterval: RollingInterval.Minute)
+    .MinimumLevel.Warning()
+    .CreateLogger();
+//.MinimumLevel.Information()
+//.MinimumLevel.Warning()
+//.MinimumLevel.Error;
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor(); // para poder consumir dentro do repositorio
@@ -102,6 +115,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHanderMiddleware>();
 
 app.UseHttpsRedirection();
 

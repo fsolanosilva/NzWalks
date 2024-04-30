@@ -45,8 +45,14 @@ namespace NzWalks.API.Controllers
         {
             var walksDomainModel = await walkRepository.GetAllAsync(filterOn, filterQuery, sortBy, isAscending ?? true, pageNumber, pageSize);
 
+            // Create an exception, for a test for global exception
+            throw new Exception("This is a new exception");
+
             // Map Domain model to Dto
             return Ok(mapper.Map<List<WalkDto>>(walksDomainModel));
+
+            // example force error
+            //  return Problem("Something went wrong", null, (int)HttpStatusCode.InternalServerError); Middlewares
         }
 
         // Get Walk By Id

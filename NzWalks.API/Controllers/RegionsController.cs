@@ -6,6 +6,7 @@ using NzWalks.API.Data;
 using NzWalks.API.Models.Domain;
 using NzWalks.API.Models.DTO;
 using NzWalks.API.Repositories;
+using System.Text.Json;
 
 namespace NzWalks.API.Controllers
 {
@@ -19,40 +20,60 @@ namespace NzWalks.API.Controllers
         private readonly NzWalksDbContext dbContext;
         private readonly IRegionRepository regionRepository;
         private readonly IMapper mapper;
+        private readonly ILogger<RegionsController> logger;
 
         public RegionsController(NzWalksDbContext dbContext, IRegionRepository regionRepository,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<RegionsController> logger)
         {
             this.dbContext = dbContext;
             this.regionRepository = regionRepository;
             this.mapper = mapper;
+            this.logger = logger;
         }
 
         // GET ALL REGIONS
         // GET: https://localhost:portnumber/api/regions
         [HttpGet]
-        [Authorize(Roles = "Reader")]
+        //[Authorize(Roles = "Reader")]
         public async Task<IActionResult> GetAll()
         {
-            // Get Data From Database - Domain model
-            //var regionsDomain = await dbContext.Regions.ToListAsync();
-            var regionsDomain = await regionRepository.GetAllAsync();
-            #region old
-            // Map Domain MNodels to DTOs
-            //var regionsDto = new List<RegionDto>();
-            //foreach (var region in regionsDomain)
-            //{
-            //    regionsDto.Add(new RegionDto
-            //    {
-            //        Id = region.Id,
-            //        Code = region.Code,
-            //        Name = region.Name,
-            //        RegionImageUrl = region.RegionImageUrl
-            //    });
-            //}
-            #endregion
-            // Return DTOs
-            return Ok(mapper.Map<List<RegionDto>>(regionsDomain));
+            try
+            {
+                throw new Exception("This is custom exception");
+
+                logger.LogInformation("GetAllRegions Action Method was invoked");
+
+                logger.LogWarning("This is warning log");
+                logger.LogError("This is error log");
+                // Get Data From Database - Domain model
+                //var regionsDomain = await dbContext.Regions.ToListAsync();
+                var regionsDomain = await regionRepository.GetAllAsync();
+                #region old
+                // Map Domain MNodels to DTOs
+                //var regionsDto = new List<RegionDto>();
+                //foreach (var region in regionsDomain)
+                //{
+                //    regionsDto.Add(new RegionDto
+                //    {
+                //        Id = region.Id,
+                //        Code = region.Code,
+                //        Name = region.Name,
+                //        RegionImageUrl = region.RegionImageUrl
+                //    });
+                //}
+                #endregion
+                // Return DTOs
+
+                logger.LogInformation($"Finished GetAllRegions request with data: {JsonSerializer.Serialize(regionsDomain)}");
+
+                return Ok(mapper.Map<List<RegionDto>>(regionsDomain));
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, ex.Message);
+                throw;
+            }
         }
 
         // GET SINGLE REGION (GET REGION BY ID)
